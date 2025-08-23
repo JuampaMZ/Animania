@@ -1,103 +1,106 @@
-import Image from "next/image";
+"use client";
+import { useMemo, useState } from "react";
+import { THEMES } from "../lib/themes";
+import ThemeGrid from "../components/ThemeGrid";
+import WhatsAppFab from "../components/WhatsAppFab";
+import { buildWhatsAppLink } from "../lib/whatsapp";
+import Hero from "../components/Hero";
+import HowTo from "../components/HowTo";
+import Contact from "../components/Contact";
+import FAQ from "../components/FAQ";
+import Testimonials from "../components/Testimonials";
+import SelectionBar from "../components/SelectionBar";
+import Link from "next/link";
+import { useReveal } from "../lib/useReveal";
 
-export default function Home() {
+export default function HomePage() {
+  useReveal(); // activa IntersectionObserver para [data-reveal]
+
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
+  const [date, setDate] = useState<string>("");
+
+  const selectedNames = useMemo(
+    () => THEMES.filter((t) => selected.has(t.slug)).map((t) => t.name),
+    [selected]
+  );
+
+  const toggle = (slug: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else {
+        next.add(slug);
+      }
+      return next;
+    });
+  };
+
+  const whatsAppHref = buildWhatsAppLink({ themes: selectedNames, date });
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div>
+      <Hero whatsAppHref={whatsAppHref} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <section
+        id="tematicas"
+        className="section section--tematicas"
+        style={{ paddingBlock: "80px", marginTop: "min(16vh, 140px)" }}
+      >
+        <header data-reveal>
+          <h2 className="section-title" style={{ marginBottom: "8px" }}>
+            Temáticas (Animanías)
+          </h2>
+          <p className="section-sub">
+            Elige una o varias opciones y arma tu combo ideal.
+          </p>
+        </header>
+        <div className="themes-gap" data-reveal>
+          <ThemeGrid selected={selected} toggle={toggle} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="select-bar reveal" data-reveal>
+          <div style={{ flex: 1 }}>
+            <p className="muted">
+              Seleccionadas:{" "}
+              {selectedNames.length ? selectedNames.join(", ") : "(ninguna)"}
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <label htmlFor="fecha" style={{ fontSize: ".95rem" }}>
+              Fecha
+            </label>
+            <input
+              id="fecha"
+              type="date"
+              value={date}
+              min={today}
+              onChange={(e) => setDate(e.target.value)}
+              className="form-field date-fancy"
+            />
+            <Link href={whatsAppHref} target="_blank" className="btn btn-dark">
+              Enviar selección por WhatsApp
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <HowTo whatsAppHref={whatsAppHref} />
+      <div className="section" style={{ paddingBlock: "40px" }}>
+        <div className="hero-cta"></div>
+      </div>
+      <FAQ />
+      <Testimonials />
+      <Contact />
+      <div className="sticky-cta">
+        <SelectionBar
+          count={selectedNames.length}
+          summary={selectedNames.join(" + ")}
+          whatsAppHref={whatsAppHref}
+        />
+        <WhatsAppFab themes={selectedNames} date={date} />
+      </div>
     </div>
   );
 }
