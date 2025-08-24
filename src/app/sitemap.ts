@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const themePages = THEMES.map(t => ({
     url: `${siteUrl}/tematicas/${t.slug}`,
     lastModified: now,
-    changeFrequency: "monthly",
+    changeFrequency: "monthly" as const,
     priority: 0.6
   }));
   return [...base, ...themePages];
